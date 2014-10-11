@@ -5,7 +5,7 @@ compress = require 'compression'
 dbserver = require './dbserver'
 
 app = express()
-app.use(express.static('/home/hyz/smart-campus-backend/wwwfiles'))
+app.use(express.static(__dirname + '/wwwfiles'))
 app.use(bodyParser.json())
 app.use(compress())
 
@@ -20,6 +20,3 @@ app.get '/checkout', (req, res) ->
 app.post '/submit', (req, res) ->
 	# don't be afraid for no check to the post data, body-parser has did that.
 	db.submit(req.body, res)
-
-app.listen 9000, ->
-	console.log "Listening on #{this.address().address}:#{this.address().port}"
