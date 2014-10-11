@@ -9,9 +9,6 @@ app.use(express.static(__dirname + '/wwwfiles'))
 app.use(bodyParser.json())
 app.use(compress())
 
-process.on 'uncaughtException', (err) ->
-	console.log err
-
 db = new dbserver.DbServer()
 
 app.get '/checkout', (req, res) ->
