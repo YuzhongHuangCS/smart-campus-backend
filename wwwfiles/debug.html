@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Debug</title>
+	<style>
+		textarea{
+			width: 50rem;
+			height: 10rem;
+		}
+	</style>
+</head>
+
+<body ng-app ng-controller="debugControl">
+	<p>Fill the json data you want to submit</p>
+	<textarea ng-model="postData"></textarea>
+	<br/>
+	<button ng-click="submit()">Submit</button>
+	<p>Results:</p>
+	<div>{{result}}</div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script>
+function debugControl($scope, $http) {
+	$scope.postData = '{"CHANNEL":"0","Link speed":"65","Supplicant state":"COMPLETED","SSID":"SUTD_Student","Metered hint":"false","Net ID":"23","RSSI":"-40","MAC":"38:bc:1a:9b:04:aa","BSSID":"d8:c7:c8:5e:82:cb"}';
+
+	$scope.submit = function submit(){
+		var config = {
+			method: 'POST',
+			url: '/submit',
+			data: $scope.postData,
+		}
+
+		$http(config).success(function(data, response) {
+			$scope.result = response;
+		});
+	};
+}
+</script>
+</html>

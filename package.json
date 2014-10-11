@@ -1,0 +1,12 @@
+{
+  "name": "smart-campus-backend",
+  "description": "backend for smart campus, it can handle any format of json data.",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "x",
+    "body-parser": "x",
+    "compression": "x",
+    "mongodb": "x"
+  }
+}
