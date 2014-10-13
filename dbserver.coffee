@@ -27,7 +27,7 @@ class DbServer
 					newY = (docs.y * docWeight + json.y * valueWeight) / newWeight
 					newZ = (docs.z * docWeight + json.z * valueWeight) / newWeight
 
-					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "weight": newWeight}}, (err) ->
+					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "z": newZ, "weight": newWeight}}, (err) ->
 						console.log(err) if err
 				else
 					record =
@@ -38,8 +38,39 @@ class DbServer
 						"z": json.z
 						"weight": (2 * (value.level + 100))**2
 
-					@wifi.insert record, (err, docs) ->
+					@wifi.insert record, (err) ->
 						console.log(err) if err
+
+	query: (json, res) =>
+		scans = json.scan.map (value) ->
+			return value.BSSID
+
+		weights = {}
+		for index, value of json.scan
+			weights[value.BSSID] = (2 * (value.level + 100))**2
+
+		place = [0, 0, 0, 0]
+
+		@wifi.find({"BSSID": {$in: scans}}).toArray (err, docs) ->
+			console.log(err) if err
+
+			for item in docs
+				if item.BSSID of weights
+					itemWeight = weights[item.BSSID]
+					[x, y, z, w] = place
+					newWeight = itemWeight + w
+					newX = (x * w + item.x * itemWeight) / newWeight
+					newY = (y * w + item.y * itemWeight) / newWeight
+					newZ = (z * w + item.z * itemWeight) / newWeight
+					place = [newX, newY, newZ, newWeight]
+
+			location =
+				"x": place[0]
+				"y": place[1]
+				"z": place[2]
+				"weight": place[3]
+
+			res.send(location)
 
 	checkout: (res) =>
 		@collection.find().toArray (err, docs) ->
