@@ -7,17 +7,41 @@ class DbServer
 		MongoClient.connect url, (err, db) =>
 			process.exit(err) if err
 			@db = db
-			@collection = db.collection('raw');
+			@raw = db.collection('raw')
+			@wifi = db.collection('wifi')
 
-	submit: (data, res) =>
-		@collection.insert data, (err) ->
+	submit: (json, res) =>
+		@raw.insert data, (err) ->
 			if err
 				res.status(403).end()
 			else
 				res.status(200).end()
 
+		json.scan.forEach (value) =>
+			@wifi.findOne {"BSSID": value.BSSID}, (err, docs) =>
+				if docs?
+					docWeight = docs.weight
+					valueWeight = 2 * (value.level + 100)
+					newWeight = docWeight + valueWeight
+					newX = (docs.x * docWeight + json.x * valueWeight) / newWeight
+					newY = (docs.y * docWeight + json.y * valueWeight) / newWeight
+
+					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "weight": newY}}, (err) ->
+						console.log(err) if err
+				else
+					record =
+						"SSID": value.SSID
+						"BSSID": value.BSSID
+						"x": json.x
+						"y": json.y
+						"z": json.z
+						"weight": 2 * (value.level + 100)
+
+					@wifi.insert record, (err, docs) ->
+						console.log(err) if err
+
 	checkout: (res) =>
-		@collection.find().toArray (err, docs)->
+		@collection.find().toArray (err, docs) ->
 			if err
 				res.status(500).end()
 			else
