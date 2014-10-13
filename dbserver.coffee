@@ -11,7 +11,7 @@ class DbServer
 			@wifi = db.collection('wifi')
 
 	submit: (json, res) =>
-		@raw.insert data, (err) ->
+		@raw.insert json, (err) ->
 			if err
 				res.status(403).end()
 			else
