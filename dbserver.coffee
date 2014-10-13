@@ -27,7 +27,7 @@ class DbServer
 					newY = (docs.y * docWeight + json.y * valueWeight) / newWeight
 					newZ = (docs.z * docWeight + json.z * valueWeight) / newWeight
 
-					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "weight": newY}}, (err) ->
+					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "weight": newWeight}}, (err) ->
 						console.log(err) if err
 				else
 					record =
