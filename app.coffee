@@ -17,3 +17,5 @@ app.get '/checkout', (req, res) ->
 app.post '/submit', (req, res) ->
 	# don't be afraid for no check to the post data, body-parser has did that.
 	db.submit(req.body, res)
+
+exports.app = app
