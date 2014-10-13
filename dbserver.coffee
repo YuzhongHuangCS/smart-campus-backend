@@ -21,10 +21,11 @@ class DbServer
 			@wifi.findOne {"BSSID": value.BSSID}, (err, docs) =>
 				if docs?
 					docWeight = docs.weight
-					valueWeight = 2 * (value.level + 100)
+					valueWeight = (2 * (value.level + 100))**2
 					newWeight = docWeight + valueWeight
 					newX = (docs.x * docWeight + json.x * valueWeight) / newWeight
 					newY = (docs.y * docWeight + json.y * valueWeight) / newWeight
+					newZ = (docs.z * docWeight + json.z * valueWeight) / newWeight
 
 					@wifi.update {"BSSID":value.BSSID}, {$set:{"x":newX, "y": newY, "weight": newY}}, (err) ->
 						console.log(err) if err
@@ -35,7 +36,7 @@ class DbServer
 						"x": json.x
 						"y": json.y
 						"z": json.z
-						"weight": 2 * (value.level + 100)
+						"weight": (2 * (value.level + 100))**2
 
 					@wifi.insert record, (err, docs) ->
 						console.log(err) if err
