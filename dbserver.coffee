@@ -73,7 +73,7 @@ class DbServer
 			res.send(location)
 
 	checkout: (res) =>
-		@collection.find().toArray (err, docs) ->
+		@raw.find().toArray (err, docs) ->
 			if err
 				res.status(500).end()
 			else
