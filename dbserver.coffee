@@ -21,7 +21,7 @@ class DbServer
 			@wifi.findOne {"BSSID": value.BSSID}, (err, docs) =>
 				if docs?
 					docWeight = docs.weight
-					valueWeight = (2 * (value.level + 100))**2
+					valueWeight = @weight(value.level, value.frequency)
 					newWeight = docWeight + valueWeight
 					newX = (docs.x * docWeight + json.x * valueWeight) / newWeight
 					newY = (docs.y * docWeight + json.y * valueWeight) / newWeight
@@ -36,7 +36,7 @@ class DbServer
 						"x": json.x
 						"y": json.y
 						"z": json.z
-						"weight": (2 * (value.level + 100))**2
+						"weight": @weight(value.level, value.frequency)
 
 					@wifi.insert record, (err) ->
 						console.log(err) if err
@@ -47,7 +47,7 @@ class DbServer
 
 		weights = {}
 		for index, value of json.scan
-			weights[value.BSSID] = (2 * (value.level + 100))**2
+			weights[value.BSSID] = @weight(value.level, value.frequency)
 
 		place = [0, 0, 0, 0]
 
@@ -78,5 +78,9 @@ class DbServer
 				res.status(500).end()
 			else
 				res.send(docs)
+
+	weight: (dbm, mhz) ->
+		exp = (27.55 - (20.0 * Math.log(mhz) / Math.LN10) + Math.abs(dbm)) / 20.0
+		return 100.0 / (10.0 ** exp)
 
 exports.DbServer = DbServer
