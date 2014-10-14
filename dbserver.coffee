@@ -49,26 +49,28 @@ class DbServer
 		for index, value of json.scan
 			weights[value.BSSID] = @weight(value.level, value.frequency)
 
-		place = [0, 0, 0, 0]
-
 		@wifi.find({"BSSID": {$in: scans}}).toArray (err, docs) ->
 			console.log(err) if err
 
-			for item in docs
-				if item.BSSID of weights
-					itemWeight = weights[item.BSSID]
-					[x, y, z, w] = place
-					newWeight = itemWeight + w
-					newX = (x * w + item.x * itemWeight) / newWeight
-					newY = (y * w + item.y * itemWeight) / newWeight
-					newZ = (z * w + item.z * itemWeight) / newWeight
-					place = [newX, newY, newZ, newWeight]
+			iter = (prev, curr) ->
+				if curr.BSSID of weights
+					currWeight = weights[curr.BSSID]
+					return [
+						prev[0] + (curr.x * currWeight),
+						prev[1] + (curr.y * currWeight),
+						prev[2] + (curr.z * currWeight),
+						prev[3] + currWeight
+					]
+				else
+					return prev
+
+			merge = docs.reduce(iter, [0, 0, 0, 0])
 
 			location =
-				"x": place[0]
-				"y": place[1]
-				"z": place[2]
-				"weight": place[3]
+				"x": merge[0] / merge[3]
+				"y": merge[1] / merge[3]
+				"z": merge[2] / merge[3]
+				"weight": merge[3]
 
 			res.send(location)
 
