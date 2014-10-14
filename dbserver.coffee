@@ -75,7 +75,7 @@ class DbServer
 			res.send(location)
 
 	checkout: (res) =>
-		@raw.find().toArray (err, docs) ->
+		@wifi.find().sort({"weight":-1}).toArray (err, docs) ->
 			if err
 				res.status(500).end()
 			else
