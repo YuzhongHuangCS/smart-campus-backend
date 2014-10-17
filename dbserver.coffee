@@ -53,16 +53,13 @@ class DbServer
 			console.log(err) if err
 
 			iter = (prev, curr) ->
-				if curr.BSSID of weights
-					currWeight = weights[curr.BSSID]
-					return [
-						prev[0] + (curr.x * currWeight),
-						prev[1] + (curr.y * currWeight),
-						prev[2] + (curr.z * currWeight),
-						prev[3] + currWeight
-					]
-				else
-					return prev
+				currWeight = weights[curr.BSSID]
+				return [
+					prev[0] + (curr.x * currWeight),
+					prev[1] + (curr.y * currWeight),
+					prev[2] + (curr.z * currWeight),
+					prev[3] + currWeight
+				]
 
 			merge = docs.reduce(iter, [0, 0, 0, 0])
 
